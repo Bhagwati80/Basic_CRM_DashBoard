@@ -2,7 +2,7 @@
 
 A modern and responsive CRM (Customer Relationship Management) Dashboard built using **HTML, CSS, and JavaScript**. The application provides a complete CRM workflow experience with lead management, sales pipeline tracking, customer management, task monitoring, analytics, and reporting.
 
-## 🚀 Live Demo : [Live Demo](basiccrmdashboard.netlify.app)
+## 🚀 Live Demo : [Live Demo](https://basiccrmdashboard.netlify.app/)
 ---
 
 ## 📌 Features
