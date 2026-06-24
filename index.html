@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM — Management Dashboard</title>
+<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="dark">
+
+<!-- NAVBAR -->
+<nav class="topnav">
+  <div class="nav-brand">
+    <div class="brand-logo"><i class="fa-solid fa-bolt"></i></div>
+    <span class="brand-text">CRM</span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a class="nav-link active" data-page="dashboard" href="#"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+    <a class="nav-link" data-page="leads" href="#"><i class="fa-solid fa-bolt"></i> Leads <span class="nav-badge">12</span></a>
+    <a class="nav-link" data-page="contacts" href="#"><i class="fa-solid fa-address-book"></i> Contacts</a>
+    <a class="nav-link" data-page="pipeline" href="#"><i class="fa-solid fa-filter"></i> Pipeline</a>
+    <a class="nav-link" data-page="customers" href="#"><i class="fa-solid fa-users"></i> Customers</a>
+    <a class="nav-link" data-page="tasks" href="#"><i class="fa-solid fa-list-check"></i> Tasks <span class="nav-badge red">5</span></a>
+    <a class="nav-link" data-page="reports" href="#"><i class="fa-solid fa-chart-bar"></i> Reports</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="globalSearch" placeholder="Search…"/>
+    </div>
+    <button class="nav-icon-btn" id="themeToggle" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+    <button class="nav-icon-btn notif-btn-wrap" id="notifBtn" title="Notifications"><i class="fa-solid fa-bell"></i><span class="notif-dot" id="notifDot" style="display:none"></span></button>
+    <button class="btn-primary" id="openModal"><i class="fa-solid fa-plus"></i> New Lead</button>
+  </div>
+  <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
+</nav>
+
+<!-- PAGES -->
+<main class="page-container">
+
+  <!-- DASHBOARD -->
+  <section id="page-dashboard" class="page active">
+    <div class="page-header">
+      
+      <div class="page-header-right">
+        <button class="btn-quick-analysis" id="quickAnalysisBtn"><i class="fa-solid fa-chart-line"></i> Quick Analysis</button>
+        
+      </div>
+
+      <div class="insights-bar">
+        <div class="ins-label"><i class="fa-solid fa-lightbulb"></i> Management Insights</div>
+        <div class="ins-items" id="quickList"></div>
+      </div>
+    </div>
+
+    
+
+    <!-- KPI ROW -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid charts-grid-2">
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Revenue & Leads Trend</div><div class="card-sub">Jan–Jun 2025 · ₹ in Lakhs</div></div></div>
+        <canvas id="revenueChart" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Lead Sources</div><div class="card-sub">Where leads come from</div></div></div>
+        <canvas id="sourceChart" height="200"></canvas>
+      </div>
+    </div>
+    <!-- Hidden pipeline chart (still used for reports) -->
+    <canvas id="pipelineChart" style="display:none" height="0"></canvas>
+    <div id="donutLegend" style="display:none"></div>
+
+    
+
+    <div class="three-col-row">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Conversion Funnel</div><div class="card-sub">Stage drop-off</div></div>
+        <div id="funnelWrap" class="funnel-wrap"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Activity Feed</div><button class="btn-ghost" id="clearFeed">Clear</button></div>
+        <div id="activityFeed" class="activity-feed"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Team Performance</div><div class="card-sub">June 2025</div></div></div>
+        <div id="teamList" class="team-list"></div>
+      </div>
+    </div>
+
+    
+  </section>
+
+  <!-- LEADS -->
+  <section id="page-leads" class="page">
+    <div class="page-header">
+      <div><h1 class="page-title">Leads Management</h1><p class="page-sub">Track and manage all incoming leads</p></div>
+      <button class="btn-primary" id="openModalLeads"><i class="fa-solid fa-plus"></i> New Lead</button>
+    </div>
+    <div class="cards-row">
+      <div class="info-box" style="--c:#6366f1"><div class="ib-num" data-target="248">0</div><div class="ib-lbl">Total Leads</div></div>
+      <div class="info-box" style="--c:#06b6d4"><div class="ib-num" data-target="162">0</div><div class="ib-lbl">Qualified</div></div>
+      <div class="info-box" style="--c:#10b981"><div class="ib-num" data-target="89">0</div><div class="ib-lbl">Converted</div></div>
+      <div class="info-box" style="--c:#f59e0b"><div class="ib-num" data-target="12">0</div><div class="ib-lbl">Lost</div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-hd">
+        <div class="card-title">All Leads</div>
+        <div class="table-toolbar">
+          <input class="tbl-search" id="leadFilter2" type="text" placeholder="Search leads…"/>
+          <button class="btn-sm" id="exportBtn2"><i class="fa-solid fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table id="leadsTable2"><thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Stage</th><th>Value</th><th>Owner</th><th>Priority</th><th>Date</th><th>Action</th></tr></thead><tbody id="leadsBody2"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="page-contacts" class="page">
+    <div class="page-header"><div><h1 class="page-title">Contacts</h1><p class="page-sub">All contacts in CRM</p></div></div>
+    <div class="contacts-big-grid" id="contactsBig"></div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="page-pipeline" class="page">
+    <div class="page-header"><div><h1 class="page-title">Sales Pipeline</h1><p class="page-sub">Visual stage-by-stage deal tracking</p></div></div>
+    <div class="pipeline-board" id="pipelineBoard"></div>
+  </section>
+
+  <!-- CUSTOMERS -->
+  <section id="page-customers" class="page">
+    <div class="page-header"><div><h1 class="page-title">Customers</h1><p class="page-sub">Converted & retained accounts</p></div></div>
+    <div class="cards-row">
+      <div class="info-box" style="--c:#10b981"><div class="ib-num" data-target="89">0</div><div class="ib-lbl">Total Customers</div></div>
+      <div class="info-box" style="--c:#6366f1"><div class="ib-num" data-target="96" data-suffix="%">0</div><div class="ib-lbl">Retention Rate</div></div>
+      <div class="info-box" style="--c:#ec4899"><div class="ib-num" data-prefix="₹" data-target="47" data-suffix="L">0</div><div class="ib-lbl">Monthly Revenue</div></div>
+      <div class="info-box" style="--c:#f59e0b"><div class="ib-num" data-target="18">0</div><div class="ib-lbl">Avg Deal Age (days)</div></div>
+    </div>
+    <div class="contacts-big-grid" id="customersBig" style="margin-top:16px"></div>
+  </section>
+
+  <!-- TASKS -->
+  <section id="page-tasks" class="page">
+    <div class="page-header">
+      <div><h1 class="page-title">Tasks</h1><p class="page-sub">All pending and completed tasks</p></div>
+      <button class="btn-primary" id="addTaskPageBtn"><i class="fa-solid fa-plus"></i> New Task</button>
+    </div>
+    <div class="cards-row">
+      <div class="info-box" style="--c:#6366f1"><div class="ib-num" id="taskTotalNum">0</div><div class="ib-lbl">Total Tasks</div></div>
+      <div class="info-box" style="--c:#10b981"><div class="ib-num" id="taskDoneNum">0</div><div class="ib-lbl">Completed</div></div>
+      <div class="info-box" style="--c:#f59e0b"><div class="ib-num" id="taskPendNum">0</div><div class="ib-lbl">Pending</div></div>
+      <div class="info-box" style="--c:#ef4444"><div class="ib-num" id="taskOverNum">0</div><div class="ib-lbl">Overdue</div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-hd"><div class="card-title">All Tasks</div></div>
+      <div id="taskListFull" class="task-list"></div>
+    </div>
+  </section>
+
+  <!-- REPORTS -->
+  <section id="page-reports" class="page">
+    <div class="page-header"><div><h1 class="page-title">Reports & Analytics</h1><p class="page-sub">Business performance overview</p></div></div>
+    <div class="cards-row">
+      <div class="info-box" style="--c:#6366f1"><div class="ib-num" data-prefix="₹" data-target="47" data-suffix="L">0</div><div class="ib-lbl">Revenue June</div></div>
+      <div class="info-box" style="--c:#10b981"><div class="ib-num" data-target="89">0</div><div class="ib-lbl">Deals Closed</div></div>
+      <div class="info-box" style="--c:#06b6d4"><div class="ib-num" data-target="248">0</div><div class="ib-lbl">New Leads</div></div>
+      <div class="info-box" style="--c:#f59e0b"><div class="ib-num" data-target="34" data-suffix="%">0</div><div class="ib-lbl">Conversion Rate</div></div>
+    </div>
+    <div class="charts-grid" style="margin-top:16px">
+      <div class="card"><div class="card-hd"><div class="card-title">Monthly Revenue Trend</div></div><canvas id="reportRevChart" height="200"></canvas></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Team Deal Count</div></div><canvas id="reportTeamChart" height="200"></canvas></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Lead Source Breakdown</div></div><canvas id="reportSourceChart" height="200"></canvas></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-hd"><div class="card-title">Team Performance Summary</div></div>
+      <div id="teamListReport" class="team-list"></div>
+    </div>
+  </section>
+
+  
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <span class="modal-title">Add New Lead</span>
+      <button class="modal-x" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-bd">
+      <div class="mf-row">
+        <div class="mf-grp"><label>Full Name *</label><input id="m_name" type="text" placeholder="e.g. Priya Mehta"/></div>
+        <div class="mf-grp"><label>Company</label><input id="m_company" type="text" placeholder="e.g. TechCorp India"/></div>
+      </div>
+      <div class="mf-row">
+        <div class="mf-grp"><label>Email</label><input id="m_email" type="email" placeholder="priya@company.in"/></div>
+        <div class="mf-grp"><label>Phone</label><input id="m_phone" type="text" placeholder="+91 9XXXXXXXXX"/></div>
+      </div>
+      <div class="mf-row">
+        <div class="mf-grp"><label>Stage</label>
+          <select id="m_stage">
+            <option>Lead Capture</option><option>Contact Created</option>
+            <option>Qualification</option><option>Follow-Up</option>
+            <option>Opportunity</option><option>Proposal Sent</option>
+            <option>Negotiation</option><option>Closed Won</option>
+          </select>
+        </div>
+        <div class="mf-grp"><label>Deal Value (₹L)</label><input id="m_value" type="number" placeholder="e.g. 5.5"/></div>
+      </div>
+      <div class="mf-row">
+        <div class="mf-grp"><label>Owner</label>
+          <select id="m_owner">
+            <option>Rahul Sharma</option><option>Anjali Singh</option>
+            <option>Vikram Patel</option><option>Neha Gupta</option><option>Arjun Reddy</option>
+          </select>
+        </div>
+        <div class="mf-grp"><label>Priority</label>
+          <select id="m_priority"><option>High</option><option>Medium</option><option>Low</option></select>
+        </div>
+      </div>
+      <div class="mf-grp"><label>Notes</label><textarea id="m_notes" rows="2" placeholder="Any notes…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-ghost-lg" id="cancelModal">Cancel</button>
+      <button class="btn-primary" id="saveLead">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-hd">
+    <span class="notif-panel-title"><i class="fa-solid fa-bell"></i> Notifications</span>
+    <button class="btn-ghost" id="markAllRead" style="font-size:11px;padding:3px 8px">Mark all read</button>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+  <div class="notif-panel-ft" id="notifEmpty" style="display:none">
+    <i class="fa-solid fa-check-circle" style="color:var(--green);font-size:20px;display:block;margin-bottom:6px"></i>
+    All caught up!
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
